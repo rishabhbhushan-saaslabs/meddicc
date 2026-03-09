@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Call Navigator — MEDDICC + Dialer Discovery</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1f2430;
+    --accent: #e8c547;
+    --accent2: #4ecdc4;
+    --text: #e8eaf0;
+    --text-dim: #8891a4;
+    --text-muted: #4a5160;
+    --M: #e8c547;
+    --E: #4ecdc4;
+    --D: #a78bfa;
+    --D2: #fb923c;
+    --I: #34d399;
+    --C2: #f472b6;
+    --C: #60a5fa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 15% 10%, rgba(232,197,71,0.05) 0%, transparent 55%), radial-gradient(ellipse 60% 40% at 85% 85%, rgba(78,205,196,0.04) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+  .container { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; position: relative; z-index: 1; }
+
+  /* HEADER */
+  .header { margin-bottom: 48px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
+  .header-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px, 5vw, 48px); line-height: 1.1; color: var(--text); margin-bottom: 16px; }
+  .header h1 em { font-style: italic; color: var(--accent); }
+  .header-sub { font-size: 14px; color: var(--text-dim); max-width: 580px; line-height: 1.6; }
+
+  /* MEDDICC LEGEND */
+  .meddicc-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 11px; border: 1px solid transparent; }
+  .legend-item .l { font-size: 14px; font-weight: 700; }
+  .legend-item[data-c="M"] { background: rgba(232,197,71,0.07); border-color: rgba(232,197,71,0.18); color: var(--M); }
+  .legend-item[data-c="E"] { background: rgba(78,205,196,0.07); border-color: rgba(78,205,196,0.18); color: var(--E); }
+  .legend-item[data-c="D"] { background: rgba(167,139,250,0.07); border-color: rgba(167,139,250,0.18); color: var(--D); }
+  .legend-item[data-c="D2"] { background: rgba(251,146,60,0.07); border-color: rgba(251,146,60,0.18); color: var(--D2); }
+  .legend-item[data-c="I"] { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.18); color: var(--I); }
+  .legend-item[data-c="C2"] { background: rgba(244,114,182,0.07); border-color: rgba(244,114,182,0.18); color: var(--C2); }
+  .legend-item[data-c="C"] { background: rgba(96,165,250,0.07); border-color: rgba(96,165,250,0.18); color: var(--C); }
+
+  /* FILTER PILLS */
+  .filter-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; margin-top: 20px; }
+  .meddic-bar { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+  .meddic-pill { display: flex; align-items: center; gap: 7px; padding: 5px 13px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.18s ease; user-select: none; }
+  .meddic-pill .letter { font-size: 12px; font-weight: 700; }
+  .meddic-pill[data-filter="all"] { background: var(--surface2); border-color: var(--border); color: var(--text); }
+  .meddic-pill[data-filter="M"] { background: rgba(232,197,71,0.07); border-color: rgba(232,197,71,0.18); color: var(--M); }
+  .meddic-pill[data-filter="E"] { background: rgba(78,205,196,0.07); border-color: rgba(78,205,196,0.18); color: var(--E); }
+  .meddic-pill[data-filter="D"] { background: rgba(167,139,250,0.07); border-color: rgba(167,139,250,0.18); color: var(--D); }
+  .meddic-pill[data-filter="D2"] { background: rgba(251,146,60,0.07); border-color: rgba(251,146,60,0.18); color: var(--D2); }
+  .meddic-pill[data-filter="I"] { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.18); color: var(--I); }
+  .meddic-pill[data-filter="C2"] { background: rgba(244,114,182,0.07); border-color: rgba(244,114,182,0.18); color: var(--C2); }
+  .meddic-pill[data-filter="C"] { background: rgba(96,165,250,0.07); border-color: rgba(96,165,250,0.18); color: var(--C); }
+  .meddic-pill.active { opacity: 1; transform: translateY(-1px); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .meddic-pill:not(.active) { opacity: 0.55; }
+  .meddic-pill:hover { opacity: 1; }
+
+  /* PERSONA */
+  .persona-selector { display: flex; gap: 6px; margin-bottom: 32px; flex-wrap: wrap; }
+  .persona-btn { font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.18s; letter-spacing: 0.04em; }
+  .persona-btn.active, .persona-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+
+  /* STICKY PROGRESS */
+  .progress-bar-wrap { position: sticky; top: 0; z-index: 100; background: rgba(10,12,16,0.94); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding: 11px 24px; margin: 0 -24px 36px; }
+  .progress-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+  .progress-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--text-muted); white-space: nowrap; text-transform: uppercase; }
+  .progress-track { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s ease; }
+  .progress-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); white-space: nowrap; font-weight: 500; }
+  .reset-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 5px; padding: 4px 10px; cursor: pointer; transition: all 0.18s; text-transform: uppercase; }
+  .reset-btn:hover { color: var(--accent3, #ff6b6b); border-color: var(--accent3, #ff6b6b); }
+
+  /* PHASES */
+  .phase { margin-bottom: 28px; }
+  .phase-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; cursor: pointer; padding: 4px 0; }
+  .phase-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); min-width: 24px; letter-spacing: 0.08em; }
+  .phase-title { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); flex: 1; }
+  .phase-badge { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 10px; border-radius: 100px; font-weight: 600; letter-spacing: 0.08em; }
+  .phase-toggle { font-size: 16px; color: var(--text-muted); transition: transform 0.22s ease; }
+  .phase.collapsed .phase-toggle { transform: rotate(-90deg); }
+  .phase-body { display: grid; gap: 9px; }
+  .phase.collapsed .phase-body { display: none; }
+
+  /* CARDS */
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 15px 17px; display: flex; gap: 13px; align-items: flex-start; transition: background 0.15s, opacity 0.2s; cursor: pointer; position: relative; overflow: hidden; }
+  .q-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; opacity: 0; transition: opacity 0.18s; border-radius: 2px 0 0 2px; }
+  .q-card:hover { background: var(--surface2); }
+  .q-card:hover::before { opacity: 1; }
+  .q-card.asked { opacity: 0.38; }
+  .q-card.asked::before { opacity: 1; }
+  .q-card.filtered-out { display: none; }
+
+  .q-card[data-meddic="M"]::before { background: var(--M); }
+  .q-card[data-meddic="E"]::before { background: var(--E); }
+  .q-card[data-meddic="D"]::before { background: var(--D); }
+  .q-card[data-meddic="D2"]::before { background: var(--D2); }
+  .q-card[data-meddic="I"]::before { background: var(--I); }
+  .q-card[data-meddic="C2"]::before { background: var(--C2); }
+  .q-card[data-meddic="C"]::before { background: var(--C); }
+
+  .q-check { width: 19px; height: 19px; min-width: 19px; border-radius: 5px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; margin-top: 1px; font-size: 11px; color: var(--text-muted); transition: all 0.15s; }
+  .q-content { flex: 1; }
+  .q-text { font-size: 13.5px; line-height: 1.55; color: var(--text); margin-bottom: 7px; }
+  .q-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .q-tag { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 500; letter-spacing: 0.04em; }
+  .q-tag[data-m="M"] { background: rgba(232,197,71,0.1); color: var(--M); }
+  .q-tag[data-m="E"] { background: rgba(78,205,196,0.1); color: var(--E); }
+  .q-tag[data-m="D"] { background: rgba(167,139,250,0.1); color: var(--D); }
+  .q-tag[data-m="D2"] { background: rgba(251,146,60,0.1); color: var(--D2); }
+  .q-tag[data-m="I"] { background: rgba(52,211,153,0.1); color: var(--I); }
+  .q-tag[data-m="C2"] { background: rgba(244,114,182,0.1); color: var(--C2); }
+  .q-tag[data-m="C"] { background: rgba(96,165,250,0.1); color: var(--C); }
+  .q-persona { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .q-note { font-size: 12px; color: var(--text-dim); margin-top: 7px; font-style: italic; line-height: 1.5; padding-left: 10px; border-left: 2px solid var(--border); }
+
+  .section-divider { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; }
+  .section-divider span { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-eyebrow">Sales Call Navigator</div>
+    <h1>Discovery Framework<br><em>MEDDICC + Dialer</em></h1>
+    <p class="header-sub">A complete MEDDICC-mapped call guide fused with Sales Dialer discovery. Click a question to mark it asked. Filter by component or persona to stay focused.</p>
+  </div>
+
+  <!-- MEDDICC LEGEND -->
+  <div class="meddicc-legend">
+    <div class="legend-item" data-c="M"><span class="l">M</span> Metrics</div>
+    <div class="legend-item" data-c="E"><span class="l">E</span> Economic Buyer</div>
+    <div class="legend-item" data-c="D"><span class="l">D</span> Decision Criteria</div>
+    <div class="legend-item" data-c="D2"><span class="l">D²</span> Decision Process</div>
+    <div class="legend-item" data-c="I"><span class="l">I</span> Identify Pain</div>
+    <div class="legend-item" data-c="C2"><span class="l">C</span> Competition</div>
+    <div class="legend-item" data-c="C"><span class="l">C</span> Champion</div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-inner">
+      <span class="progress-label">Progress</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <span class="progress-count" id="progressCount">0 / 0</span>
+      <button class="reset-btn" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+
+  <div class="filter-label">Filter by Persona</div>
+  <div class="persona-selector">
+    <button class="persona-btn active" onclick="filterPersona('all',this)">All</button>
+    <button class="persona-btn" onclick="filterPersona('leader',this)">Sales Leader</button>
+    <button class="persona-btn" onclick="filterPersona('manager',this)">Manager / Coach</button>
+    <button class="persona-btn" onclick="filterPersona('ops',this)">Ops</button>
+    <button class="persona-btn" onclick="filterPersona('rep',this)">Sales Rep</button>
+  </div>
+
+  <div class="filter-label">Filter by MEDDICC</div>
+  <div class="meddic-bar">
+    <div class="meddic-pill active" data-filter="all" onclick="filterMeddic('all',this)"><span class="letter">ALL</span></div>
+    <div class="meddic-pill" data-filter="M" onclick="filterMeddic('M',this)"><span class="letter">M</span> Metrics</div>
+    <div class="meddic-pill" data-filter="E" onclick="filterMeddic('E',this)"><span class="letter">E</span> Economic Buyer</div>
+    <div class="meddic-pill" data-filter="D" onclick="filterMeddic('D',this)"><span class="letter">D</span> Decision Criteria</div>
+    <div class="meddic-pill" data-filter="D2" onclick="filterMeddic('D2',this)"><span class="letter">D²</span> Decision Process</div>
+    <div class="meddic-pill" data-filter="I" onclick="filterMeddic('I',this)"><span class="letter">I</span> Identify Pain</div>
+    <div class="meddic-pill" data-filter="C2" onclick="filterMeddic('C2',this)"><span class="letter">C</span> Competition</div>
+    <div class="meddic-pill" data-filter="C" onclick="filterMeddic('C',this)"><span class="letter">C</span> Champion</div>
+  </div>
+
+  <!-- ── PHASE 1: OPEN ── -->
+  <div class="phase" id="phase1">
+    <div class="phase-header" onclick="togglePhase('phase1')">
+      <span class="phase-num">01</span>
+      <span class="phase-title">Open & Build Rapport</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>Earn the right to ask — show you've done the work</span></div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Reference a shared interest, mutual connection, or something specific about their company before diving in.</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Eg: "I saw you recently expanded your SDR team — what's driving that push right now?"</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Why did you join the call today? What are you looking to achieve with your SDR, BDR, and sales teams?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Let them talk. This surfaces both pain and motivation in their own words.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What % of your pipeline is currently outbound? What % would you like it to be?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">The gap between current and target is your core value opportunity.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Why is solving this a priority right now — what's creating the urgency?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 2: METRICS ── -->
+  <div class="phase" id="phase2">
+    <div class="phase-header" onclick="togglePhase('phase2')">
+      <span class="phase-num">02</span>
+      <span class="phase-title">Metrics — Quantify the Opportunity</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>M — put numbers on the pain before you pitch</span></div>
+
+      <div class="q-card" data-meddic="M" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What KPIs matter most to you when calling prospects? (connect rate, conversion rate, average handle time, dials per rep)</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">How many calls does an agent make per day on average? How many agents do you have in total?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">Leader / Manager</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Are your SDRs and AEs currently hitting quota? If not — what's the gap, and what do you attribute it to?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">If we improved your connect rate or conversion rate by X%, what would that mean for your revenue targets?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">Leader / Manager</span></div>
+        <div class="q-note">Force them to quantify business impact. This becomes your ROI anchor for the economic buyer conversation.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">How important is speed-to-lead? How quickly do you need to reach a new inbound lead after they come in?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">ALL</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 3: IDENTIFY PAIN ── -->
+  <div class="phase" id="phase3">
+    <div class="phase-header" onclick="togglePhase('phase3')">
+      <span class="phase-num">03</span>
+      <span class="phase-title">Identify Pain — Current State & Frustrations</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>I — dig into the real hurt, not just the stated problem</span></div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What tool are you currently using to make calls? What issues have you run into with it?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What frustrates you most about your current calling solution?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Use silence here. The first frustration they name is rarely the deepest one.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Are you engaging with warm leads, cold leads, or a mix? Do you have older lists you'd want to re-engage?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="manager,ops" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">How do you currently monitor agent performance — post-call (recordings, AI summaries) or live during calls?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">Manager / Ops</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What's the biggest obstacle keeping your team from hitting quota today?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">Leader / Manager</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What frustrates you about how team performance is monitored today? What would you change with better visibility?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">Leader / Manager</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="rep" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Does manual CRM data entry after calls slow you down? How much time does it eat per day?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">Sales Rep</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="I" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Do your reps hit a lot of answering machines? If we eliminated that wasted time — what would they do with it?</div>
+        <div class="q-meta"><div class="q-tag" data-m="I">Identify Pain</div><span class="q-persona">ALL</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 4: DECISION CRITERIA ── -->
+  <div class="phase" id="phase4">
+    <div class="phase-header" onclick="togglePhase('phase4')">
+      <span class="phase-num">04</span>
+      <span class="phase-title">Decision Criteria — What "Right" Looks Like</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>D — understand what they're scoring you against</span></div>
+
+      <div class="q-card" data-meddic="D" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What would a successful outcome look like — for you personally and for the team?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="leader,ops" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Do you have a preference on dialer type — Predictive, Power/Auto, Dynamic, or Preview? What's driving that preference?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Leader / Ops</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="ops,leader" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What CRM are you running? Do you need tight two-way sync — auto-logging calls, updating contact lists, launching campaigns from inside the CRM?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Ops / Leader</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="leader,ops" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Is compliance a hard requirement? (10DLC, STIR/SHAKEN, CNAM, SOC 2, GDPR, call recording laws)</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Leader / Ops</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="manager,leader" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Do you need local presence — displaying local area codes when calling across different regions?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Manager / Leader</span></div>
+        <div class="q-note">Key for real estate, insurance, and high-volume outbound orgs.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="manager,rep" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Would AI coaching tools (call scoring, live script assist, moment analysis) be on your must-have list?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Manager / Rep</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D" data-persona="manager,rep" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Would call summaries, action items, and auto-transcriptions be valuable for your workflow or coaching?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D">Decision Criteria</div><span class="q-persona">Manager / Rep</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 5: DECISION PROCESS ── -->
+  <div class="phase" id="phase5">
+    <div class="phase-header" onclick="togglePhase('phase5')">
+      <span class="phase-num">05</span>
+      <span class="phase-title">Decision Process — How They Buy</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>D² — map the buying journey before it maps you</span></div>
+
+      <div class="q-card" data-meddic="D2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Walk me through how a decision like this typically gets made at your company. Who else is involved?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What's your timeline to make a decision? Is there an event or deadline driving that?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D2" data-persona="ops,leader" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Is scalability or security a concern? Will procurement need SOC 2 or GDPR documentation?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">Ops / Leader</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What would need to be true for you to move forward in the next 30–60 days?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Surfaces blockers early. Don't skip this — it's where deals die or accelerate.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 6: ECONOMIC BUYER ── -->
+  <div class="phase" id="phase6">
+    <div class="phase-header" onclick="togglePhase('phase6')">
+      <span class="phase-num">06</span>
+      <span class="phase-title">Economic Buyer — Find the Power</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>E — who controls the budget and the final yes?</span></div>
+
+      <div class="q-card" data-meddic="E" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Who ultimately signs off on a purchase like this? Is that person involved in our conversation today?</div>
+        <div class="q-meta"><div class="q-tag" data-m="E">Economic Buyer</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="E" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Is budget already allocated for this, or would you need to build a business case internally?</div>
+        <div class="q-meta"><div class="q-tag" data-m="E">Economic Buyer</div><span class="q-persona">Leader / Manager</span></div>
+        <div class="q-note">No budget yet? Pivot to ROI framing. Use the metrics gap you surfaced in Phase 2.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="E" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">If we can show strong ROI, could you get executive sponsorship? What would that internal conversation look like?</div>
+        <div class="q-meta"><div class="q-tag" data-m="E">Economic Buyer</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="E" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What does the economic buyer care most about — cost reduction, revenue growth, compliance, or something else?</div>
+        <div class="q-meta"><div class="q-tag" data-m="E">Economic Buyer</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Shape your demo and business case to hit their specific priority — not yours.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 7: COMPETITION ── -->
+  <div class="phase" id="phase7">
+    <div class="phase-header" onclick="togglePhase('phase7')">
+      <span class="phase-num">07</span>
+      <span class="phase-title">Competition — Know the Battlefield</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>C — Competition: who else are they talking to?</span></div>
+
+      <div class="q-card" data-meddic="C2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Are you evaluating other solutions right now? Who else are you looking at?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">If they're hesitant to name names, ask: "Are you looking at both dedicated dialers and all-in-one platforms?"</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What have you seen from the other solutions you've evaluated? What's impressed you, and what's been disappointing?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Their answer tells you exactly what they'll use to compare you. Align your demo accordingly.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Is your current solution (the status quo) also on the table — meaning "do nothing" is still an option?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">The status quo is always your biggest competitor. Make the cost of inaction explicit.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C2" data-persona="leader,manager" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">If you had to rank your top 3 criteria for choosing between solutions, what would they be?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">Leader / Manager</span></div>
+        <div class="q-note">Directly reveals where you need to win. Use this to sharpen your close.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What would make you choose us over the other options you're looking at?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">ALL</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 8: CHAMPION ── -->
+  <div class="phase" id="phase8">
+    <div class="phase-header" onclick="togglePhase('phase8')">
+      <span class="phase-num">08</span>
+      <span class="phase-title">Champion — Build Your Internal Ally</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>C — Champion: who will fight for you when you're not in the room?</span></div>
+
+      <div class="q-card" data-meddic="C" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">How does this affect you personally? What does it mean for you if this problem gets solved?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C">Champion</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Champions need personal stake. Find their "why" — visibility, team morale, hitting their own number.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C" data-persona="manager,rep" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">How do you think a more efficient dialer would affect your team's motivation and daily energy?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C">Champion</div><span class="q-persona">Manager / Rep</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Who else in your org would benefit from seeing this? Would you be comfortable making an introduction?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C">Champion</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">If we deliver on everything we've discussed, would you feel confident recommending this solution internally?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C">Champion</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Test champion strength. Hesitation = more work needed before advancing the deal.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHASE 9: CLOSE ── -->
+  <div class="phase" id="phase9">
+    <div class="phase-header" onclick="togglePhase('phase9')">
+      <span class="phase-num">09</span>
+      <span class="phase-title">Close the Call — Confirm & Commit to Next Steps</span>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="phase-body">
+      <div class="section-divider"><span>Never leave a call without a concrete next step locked</span></div>
+
+      <div class="q-card" data-meddic="D2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">"Let me recap: you're trying to [goal], the current blocker is [pain], and success looks like [metric]. Does that resonate?"</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Always confirm your summary before proposing next steps. Misalignment here kills deals silently.</div></div>
+      </div>
+
+      <div class="q-card" data-meddic="C2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Based on what you've shared about what matters to you and who you're comparing us with — is there anything we'd need to nail in a demo to be a clear frontrunner?</div>
+        <div class="q-meta"><div class="q-tag" data-m="C2">Competition</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="D2" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">Can we schedule a deeper demo with [decision maker / champion] this week or next?</div>
+        <div class="q-meta"><div class="q-tag" data-m="D2">Decision Process</div><span class="q-persona">ALL</span></div></div>
+      </div>
+
+      <div class="q-card" data-meddic="M" data-persona="all" onclick="toggleCard(this)">
+        <div class="q-check"></div><div class="q-content">
+        <div class="q-text">What would you need to see in a demo or pilot to feel fully confident this is the right fit?</div>
+        <div class="q-meta"><div class="q-tag" data-m="M">Metrics</div><span class="q-persona">ALL</span></div>
+        <div class="q-note">Lock down success criteria now — not after the demo when it's too late to adjust.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let activeFilter = 'all';
+  let activePersona = 'all';
+
+  function toggleCard(el) {
+    const wasAsked = el.classList.contains('asked');
+    el.classList.toggle('asked');
+    el.querySelector('.q-check').textContent = wasAsked ? '' : '✓';
+    updateProgress();
+  }
+
+  function togglePhase(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+
+  function filterMeddic(val, pill) {
+    activeFilter = val;
+    document.querySelectorAll('.meddic-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    applyFilters();
+  }
+
+  function filterPersona(val, btn) {
+    activePersona = val;
+    document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    document.querySelectorAll('.q-card').forEach(card => {
+      const meddic = card.dataset.meddic;
+      const personaArr = (card.dataset.persona || 'all').split(',');
+      const meddicMatch = activeFilter === 'all' || meddic === activeFilter;
+      const personaMatch = activePersona === 'all' || personaArr.includes(activePersona);
+      card.classList.toggle('filtered-out', !(meddicMatch && personaMatch));
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const visible = document.querySelectorAll('.q-card:not(.filtered-out)');
+    const asked = document.querySelectorAll('.q-card:not(.filtered-out).asked');
+    const total = visible.length;
+    const done = asked.length;
+    document.getElementById('progressFill').style.width = (total > 0 ? (done / total) * 100 : 0) + '%';
+    document.getElementById('progressCount').textContent = done + ' / ' + total;
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.q-card').forEach(card => {
+      card.classList.remove('asked');
+      card.querySelector('.q-check').textContent = '';
+    });
+    updateProgress();
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
