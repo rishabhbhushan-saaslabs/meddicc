@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MEDDICC Call Navigator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 /* ─── RESET & BASE ─── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,17 +47,52 @@
   --radius: 12px;
   --radius-sm: 8px;
   --duration: 0.22s;
+  --fs-base: 14px;
 }
+
+/* ─── LIGHT THEME ─── */
+body.light {
+  --bg:    #f4f5f7;
+  --bg2:   #ffffff;
+  --bg3:   #eef0f4;
+  --bg4:   #e6e9ef;
+  --line:  #dde0e8;
+  --line2: #cdd1db;
+  --text:  #111318;
+  --sub:   #5a6175;
+  --muted: #a0a8bc;
+  --gold:     #c48a00;
+  --goldf:    rgba(196,138,0,0.1);
+  --teal:     #1fa090;
+  --tealf:    rgba(31,160,144,0.1);
+  --violet:   #6b4fcf;
+  --violetf:  rgba(107,79,207,0.1);
+  --amber:    #c05818;
+  --amberf:   rgba(192,88,24,0.1);
+  --green:    #1a9e5c;
+  --greenf:   rgba(26,158,92,0.1);
+  --rose:     #c0306a;
+  --rosef:    rgba(192,48,106,0.1);
+  --sky:      #2070c8;
+  --skyf:     rgba(32,112,200,0.1);
+}
+body.light .bg-orb:nth-child(1) { background: radial-gradient(circle, rgba(196,138,0,0.06) 0%, transparent 70%); }
+body.light .bg-orb:nth-child(2) { background: radial-gradient(circle, rgba(31,160,144,0.04) 0%, transparent 70%); }
+body.light .bg-orb:nth-child(3) { background: radial-gradient(circle, rgba(107,79,207,0.03) 0%, transparent 70%); }
+body.light .bg-grid { background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px); background-size: 60px 60px; }
+body.light .toolbar { background: rgba(244,245,247,0.92); }
 
 html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Syne', sans-serif;
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--fs-base);
   min-height: 100vh;
   overflow-x: hidden;
   cursor: default;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* ─── ANIMATED BACKGROUND ─── */
@@ -157,7 +192,7 @@ body {
 }
 
 .eyebrow {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.22em;
@@ -176,7 +211,7 @@ body {
 }
 
 h1 {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'DM Serif Display', serif;
   font-size: clamp(34px, 6vw, 58px);
   line-height: 1.05;
   font-weight: 400;
@@ -220,14 +255,14 @@ h1 em {
 .strip-item:hover { transform: translateY(-2px); }
 
 .strip-letter {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'DM Serif Display', serif;
   font-size: 22px;
   font-weight: 400;
   line-height: 1;
 }
 
 .strip-word {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 8.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -288,7 +323,7 @@ h1 em {
 }
 
 .toolbar-label {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -297,7 +332,7 @@ h1 em {
 }
 
 .filter-chip {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -337,7 +372,7 @@ h1 em {
   width: 0%;
 }
 .progress-nums {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 11px;
   color: var(--gold);
   white-space: nowrap;
@@ -345,7 +380,7 @@ h1 em {
 }
 
 .reset-btn {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -440,7 +475,7 @@ h1 em {
 }
 
 .phase-num {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 10px;
   font-weight: 500;
   color: var(--muted);
@@ -451,7 +486,7 @@ h1 em {
 .phase-title-wrap { flex: 1; }
 
 .phase-title {
-  font-family: 'Instrument Serif', serif;
+  font-family: 'DM Serif Display', serif;
   font-size: 17px;
   font-weight: 400;
   color: var(--text);
@@ -459,7 +494,7 @@ h1 em {
 }
 
 .phase-sub {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9.5px;
   color: var(--muted);
   letter-spacing: 0.1em;
@@ -474,7 +509,7 @@ h1 em {
 }
 
 .phase-badge {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.08em;
   padding: 3px 9px;
@@ -483,7 +518,7 @@ h1 em {
 }
 
 .phase-count {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 11px;
   color: var(--muted);
   min-width: 32px;
@@ -604,7 +639,7 @@ h1 em {
 }
 
 .q-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9.5px;
   padding: 2px 9px;
   border-radius: 100px;
@@ -621,7 +656,7 @@ h1 em {
 .q-tag[data-m="C"]  { background: var(--Cf);  color: var(--C); border: 1px solid rgba(91,168,245,0.2); }
 
 .q-persona {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 9.5px;
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -647,7 +682,7 @@ h1 em {
   display: none;
 }
 .empty-state.visible { display: block; }
-.empty-state p { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.1em; }
+.empty-state p { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.1em; }
 
 /* ─── ANIMATIONS ON CARD CHECK ─── */
 @keyframes checkPop {
@@ -663,6 +698,93 @@ h1 em {
 ::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
+/* ─── THEME TOGGLE (top-right fixed) ─── */
+.theme-toggle {
+  position: fixed;
+  top: 18px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  border-radius: 100px;
+  padding: 6px 10px 6px 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  user-select: none;
+}
+.theme-toggle:hover { border-color: var(--gold); box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(240,192,64,0.15); }
+.theme-toggle-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sub);
+  transition: color 0.2s;
+}
+.theme-toggle:hover .theme-toggle-label { color: var(--text); }
+.theme-switch {
+  width: 36px; height: 20px;
+  background: var(--line2);
+  border-radius: 100px;
+  position: relative;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+}
+.theme-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--sub);
+  transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+body.light .theme-switch { background: var(--gold); }
+body.light .theme-switch::after { transform: translateX(16px); background: #fff; }
+.theme-icon { font-size: 13px; line-height: 1; }
+
+/* ─── FONT SIZE CONTROLS (bottom-right fixed) ─── */
+.font-controls {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.font-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  color: var(--sub);
+  font-size: 18px;
+  font-family: 'DM Serif Display', serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  user-select: none;
+  line-height: 1;
+}
+.font-btn:hover { background: var(--bg3); border-color: var(--gold); color: var(--gold); transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.font-btn:active { transform: scale(0.95); }
+.font-size-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 640px) {
   .wrap { padding: 0 16px 80px; }
@@ -670,6 +792,8 @@ h1 em {
   .meddicc-strip { gap: 4px; }
   .strip-item { min-width: 56px; padding: 8px 10px; }
   .strip-letter { font-size: 18px; }
+  .theme-toggle { top: 12px; right: 12px; }
+  .font-controls { bottom: 16px; right: 12px; }
 }
 </style>
 </head>
@@ -682,6 +806,20 @@ h1 em {
 </div>
 <div class="bg-grid"></div>
 <div class="bg-grain"></div>
+
+<!-- THEME TOGGLE -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark">
+  <span class="theme-icon" id="themeIcon">🌙</span>
+  <span class="theme-toggle-label" id="themeLabel">Dark</span>
+  <div class="theme-switch"></div>
+</div>
+
+<!-- FONT SIZE CONTROLS -->
+<div class="font-controls">
+  <button class="font-btn" onclick="adjustFont(1)" title="Increase font size">A+</button>
+  <span class="font-size-label" id="fontLabel">14px</span>
+  <button class="font-btn" onclick="adjustFont(-1)" title="Decrease font size" style="font-size:13px">A−</button>
+</div>
 
 <div class="wrap">
 
@@ -1296,9 +1434,44 @@ function resetAll() {
   updatePhaseCounts();
 }
 
-// Init
-updateProgress();
-updatePhaseCounts();
+// ─── THEME TOGGLE ───
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// ─── FONT SIZE ───
+let fontSize = 14;
+const minFs = 11, maxFs = 20;
+function adjustFont(delta) {
+  fontSize = Math.min(maxFs, Math.max(minFs, fontSize + delta));
+  document.documentElement.style.setProperty('--fs-base', fontSize + 'px');
+  document.getElementById('fontLabel').textContent = fontSize + 'px';
+  localStorage.setItem('fontSize', fontSize);
+}
+
+// ─── INIT ───
+(function init() {
+  const savedTheme = localStorage.getItem('theme');
+  const savedFs    = localStorage.getItem('fontSize');
+  if (savedTheme === 'light') {
+    isDark = false;
+    document.body.classList.add('light');
+    document.getElementById('themeIcon').textContent = '☀️';
+    document.getElementById('themeLabel').textContent = 'Light';
+  }
+  if (savedFs) {
+    fontSize = parseInt(savedFs);
+    document.documentElement.style.setProperty('--fs-base', fontSize + 'px');
+    document.getElementById('fontLabel').textContent = fontSize + 'px';
+  }
+  updateProgress();
+  updatePhaseCounts();
+})();
 </script>
 </body>
 </html>
